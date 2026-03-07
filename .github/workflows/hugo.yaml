@@ -28,18 +28,19 @@ jobs:
 
       - name: Build with Hugo
         env:
-          HUGO_PARAMS_SEARCH_ALGOLIA_SEARCHKEY: ${{ vars.HUGO_SEARCH_KEY }}
+          HUGO_PARAMS_SEARCH_ALGOLIA_SEARCHKEY: ${{ secrets.HUGO_SEARCH_KEY }}
+          HUGO_PARAMS_SEARCH_ALGOLIA_APPID: ${{ secrets.APPLICATION_ID }}
+          HUGO_PARAMS_SEARCH_ALGOLIA_INDEX: ${{ secrets.INDEX_NAME }}
         run: hugo --minify
-      
-      - name: Algolia Upload Records
-        uses: iChochy/Algolia-Upload-Records@main
-        with:
-          app_id: ${{ vars.ALGOLIA_APP_ID }}
-          api_key: ${{ secrets.ALGOLIA_ADMIN_KEY }}
-          index_name: ${{ vars.ALGOLIA_INDEX_NAME }}
-          records: "public/index.json"
-          clean: true
 
+      - name: Upload Algolia Indexes
+        uses: iChochy/Algolia-Upload-Records@main
+        env:
+          APPLICATION_ID: ${{ secrets.APPLICATION_ID }}
+          ADMIN_API_KEY: ${{ secrets.ADMIN_API_KEY }}
+          INDEX_NAME: ${{ secrets.INDEX_NAME }}
+          FILE_PATH: "public/indexjson"
+      
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

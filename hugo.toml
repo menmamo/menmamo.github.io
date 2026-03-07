@@ -81,9 +81,9 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
         highlightTag = "em"
         absoluteURL = false
         [params.search.algolia]
-            index = "index"
-            appID = "KHR331GPN8"
-            searchKey = "SEARCH_ONLY_API_KEY"
+            index = ""
+            appID = ""
+            searchKey = ""
     #主页配置
     [params.home]
         rss = 10
