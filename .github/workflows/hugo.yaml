@@ -31,13 +31,14 @@ jobs:
           HUGO_PARAMS_SEARCH_ALGOLIA_SEARCHKEY: ${{ vars.HUGO_SEARCH_KEY }}
         run: hugo --minify
       
-      - name: Push index to Algolia
-        run: |
-          curl -X POST \
-            -H "X-Algolia-API-Key: ${{ secrets.ALGOLIA_ADMIN_KEY }}" \
-            -H "X-Algolia-Application-Id: ${{ vars.ALGOLIA_APP_ID }}" \
-            --data-binary "@public/index.json" \
-            "https://${{ vars.ALGOLIA_APP_ID }}.algolia.net/1/indexes/${{ vars.ALGOLIA_INDEX_NAME }}/batch"
+      - name: Algolia Upload Records
+        uses: iChochy/Algolia-Upload-Records@v1.0.0
+        with:
+          app_id: ${{ vars.ALGOLIA_APP_ID }}
+          api_key: ${{ secrets.ALGOLIA_ADMIN_KEY }}
+          index_name: ${{ vars.ALGOLIA_INDEX_NAME }}
+          records: "public/index.json"
+          clean: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
