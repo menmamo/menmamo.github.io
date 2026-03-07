@@ -32,7 +32,7 @@ jobs:
         run: hugo --minify
       
       - name: Algolia Upload Records
-        uses: iChochy/Algolia-Upload-Records@v1.0.0
+        uses: iChochy/Algolia-Upload-Records@main
         with:
           app_id: ${{ vars.ALGOLIA_APP_ID }}
           api_key: ${{ secrets.ALGOLIA_ADMIN_KEY }}
