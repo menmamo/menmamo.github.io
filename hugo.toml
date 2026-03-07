@@ -1,4 +1,4 @@
-baseURL = 'https://menmamo.github.io/'
+baseURL = 'https://blog.menma.top/'
 languageCode = 'zh-CN'
 title = 'MenmaTop'
 theme = 'LoveIt'
