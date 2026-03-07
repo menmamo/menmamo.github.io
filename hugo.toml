@@ -1,4 +1,4 @@
-baseURL = 'https://blog.menma.top/'
+baseURL = 'https://menma.top/'
 languageCode = 'zh-CN'
 title = 'MenmaTop'
 theme = 'LoveIt'
