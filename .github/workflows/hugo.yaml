@@ -30,6 +30,14 @@ jobs:
         env:
           HUGO_PARAMS_SEARCH_ALGOLIA_SEARCHKEY: ${{ vars.HUGO_SEARCH_KEY }}
         run: hugo --minify
+      
+      - name: Upload Index to Algolia
+        uses: signcl/hugo-algolia-free@v1.0.1
+        with:
+          app_id: ${{ vars.ALGOLIA_APP_ID }}
+          admin_key: ${{ secrets.ALGOLIA_ADMIN_KEY }}
+          index_name: ${{ vars.ALGOLIA_INDEX_NAME }}
+          index_file: "public/index.json"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
