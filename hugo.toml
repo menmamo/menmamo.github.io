@@ -108,9 +108,14 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
     [markup.goldmark]
       [markup.goldmark.renderer]
         unsafe = true
+      [markup.goldmark.extensions]
+        [markup.goldmark.extensions.passthrough]
+            enable = true
+            [markup.goldmark.extensions.passthrough.delimiters]
+            block = [['$$', '$$'], ['\[', '\]']]
+            inline = [['$', '$'], ['\(', '\)']]
 [outputs]
     home = ["HTML", "RSS", "JSON"]
     page = ["HTML"]
     section = ["HTML", "RSS"]
     taxonomy = ["HTML", "RSS"]
-
