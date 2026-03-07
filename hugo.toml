@@ -82,7 +82,7 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
         absoluteURL = false
         [params.search.algolia]
             index = "index"
-            appID = "YOUR_APP_ID"
+            appID = "KHR331GPN8"
             searchKey = "SEARCH_ONLY_API_KEY"
     #主页配置
     [params.home]
