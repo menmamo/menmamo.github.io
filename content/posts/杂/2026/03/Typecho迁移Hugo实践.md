@@ -6,11 +6,20 @@ categories: ["杂"]
 tags: []
 ---
 
-## 数据准备
+## 前言
 
-### 导出文章md
+最近决定将博客从 Typecho 迁移到静态网站生成器 **Hugo**。相比动态博客，Hugo 带来的加载速度、安全性以及版本控制的便利性非常显著。本文记录了从数据库导出、自动化构建到 Algolia 搜索集成的完整过程。
 
-我的typecho使用sqlite3作为数据库，没有找到合适的插件，于是直接让gemini写个导出脚本。
+## 一、数据迁移：从 SQLite 导出文章
+
+### 1. 准备工作
+
+* 拷贝 Typecho 的 `.db`数据库文件到本地。
+* 将 `usr` 目录（存放上传的图片等附件）拷贝出来到本地。
+
+### 2. 导出脚本
+
+Typecho 的文章存储在 SQLite 数据库中。为了保留分类和标签层级，我使用ai编写了一个 Python 脚本。该脚本会自动处理 `` 标记，并按照 `分类/年/月` 的结构组织文件，方便后期管理。
 
 ```python
 import sqlite3
@@ -111,27 +120,28 @@ if __name__ == "__main__":
 
 ------
 
-### 安装hugo
+## 二、环境搭建与主题配置
 
-直接使用winget安装。`--version`可以指定版本。
+### 1. 安装 Hugo
 
-```shell
+```bash
 winget install Hugo.Hugo --version 0.145.0
 ```
 
 ------
 
-### 导入文章
+### 2.初始化与导入
 
-1. `hugo new site my-blog`创建站点
-2. 文章md放入站点目录下的`/content/posts`。
-3. `usr`文件夹放入`static`目录。
+1. 运行`hugo new site my-blog`创建站点
+2. 将导出的文章放入站点目录下的`/content/posts`目录，`usr`文件夹放入`/static`目录。
 
 -----
 
-### 配置hugo.toml
+### 3.配置hugo.toml
 
-找一个喜欢的主题放入`themes`文件夹，我这里使用了`LoveIt`主题，根据文档配置如下：
+找个喜欢的主题放入`themes`文件夹，根据文档按照自己的需求进行配置。
+
+这里我使用LoveIt主题，并开启Algolia搜索支持，配置如下：
 
 ```toml
 baseURL = 'https://menma.top/'
@@ -257,13 +267,17 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
     taxonomy = ["HTML", "RSS"]
 ```
 
-最后，使用`hugo server`命令来预览效果，没有问题就可以进行下一步操作。
+------
+
+### 4.测试预览
+
+使用 `hugo server` 命令预览效果。重点检查图片资源是否正常显示，确认无误后进行下一步。
 
 ------
 
-## 部署到GithubPages
+## 三、配置Github Pages与Github Actions自动化
 
-### 创建`.gitignore`文件
+### 1.创建`.gitignore`文件
 
 因为使用`Github Action`来生成文章，所以需要在项目根目录下创建`.gitignore`文件 排除一些不必要的目录和文件
 
@@ -275,17 +289,13 @@ resources/_gen/
 
 ------
 
-### 在 GitHub 上创建仓库
+### 2.关联远程仓库
 
 仓库名必须填`<用户名>.github.io`
 
-------
-
-### 将本地项目关联到仓库
-
 在项目的根目录下执行git
 
-```shell
+```bash
 # 初始化 git
 git init
 # 添加所有文件
@@ -301,10 +311,9 @@ git push -u origin main
 
 ------
 
-#### 配置 GitHub Actions 自动化部署
+### 3.配置 GitHub Actions 自动化部署
 
-1. 在项目根目录下创建目录结构：`.github/workflows/`。
-2. 在该文件夹下新建一个文件，命名为 `hugo.yaml`。
+在项目根目录下创建 `.github/workflows/hugo.yaml`，内容如下：
 
 ```yaml
 name: Deploy Hugo site to Pages
@@ -367,76 +376,38 @@ jobs:
         uses: actions/deploy-pages@v4
 ```
 
-**在 GitHub 网页端开启服务**
+------
 
-1. 回到 GitHub 仓库页面，点击 **Settings** -> **Pages**。
-2. 在 **Build and deployment** 下的 **Source** 选项中，将默认的 "**Deploy from a branch**" 改为 **"GitHub Actions"**。
-3. 提交刚才创建的 `.github/workflows/hugo.yaml` 文件到 GitHub：
+### 4.在 GitHub 网页端开启服务
 
-```shell
-git add .
-git commit -m "Add GitHub Actions workflow"
-git push
-```
+**开启服务**
 
-点击仓库顶部的 **Actions** 选项卡，如果配置正确会有一个名为"Deploy Hugo site to Pages" 的任务正在运行，等他变成绿色，就可以看到博客了。
+GitHub 仓库 -> Settings -> Pages，将 "Source" 改为 **GitHub Actions**。
+
+**提交配置**
+
+推送 `hugo.yaml` 后，在 Actions 选项卡查看进度。
 
 ------
 
-### **修改域名**
+### 5.修改域名
 
-1. 打开 GitHub 仓库：**Settings** -> **Pages**。
-2. 修改 **Custom domain**为自己的域名
-3. 在CloudFlare中为域名添加cname记录为`用户名.github.io`
-4. 等dns生效后勾选 **Enforce HTTPS**。
-5. 修改 Hugo 的 `baseURL` 
+- 在 Settings -> Pages 中设置 **Custom domain**。
+- 在 Cloudflare 中为域名添加 CNAME 记录，指向 `用户名.github.io`。
+- 勾选 **Enforce HTTPS** 并更新 Hugo 的 `baseURL`。
 
 ------
 
-## 修改/更新博客
+## 日常更新流程
 
-至此自动化部署环境已经搭建完成，提交修改（无论是写新文章、修改配置还是更换主题设置）只需要在本地终端执行简单的 **Git 三部曲**。
+至此自动化环境搭建完成。后续更新博客只需“Git 三部曲”：
 
-**创建文章**
+**新建文章**：`hugo new posts/文章.md`
 
-```shell
-hugo new 文章
-```
+**提交修改**：
 
-**提交修改**
-
-1. 检查状态（可选）
-
-```shell
-git status
-```
-
-2. 将修改添加到暂存区
-
-```shell
+```bash
 git add .
-```
-
-或者只添加特定的文件：
-
-```shell
-git add content/posts/my-article.md
-```
-
-3. 提交到本地仓库
-
-```shell
-git commit -m "feat: 新增关于 Hugo 部署的文章"
-```
-
-4. 推送到 GitHub
-
-```shell
+git commit -m "feat: 新增文章内容"
 git push
-```
-
-如果在 GitHub 网页端直接改过文件，本地推送前需要先拉取：
-
-```shell
-git pull origin main
 ```
