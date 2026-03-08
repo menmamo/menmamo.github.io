@@ -1,7 +1,7 @@
 ---
 title: "Typecho迁移Hugo实践"
 author: "mona"
-date = '2026-03-08T12:15:45+08:00'
+date: '2026-03-08T12:15:45+08:00'
 categories: ["杂"]
 tags: []
 ---
