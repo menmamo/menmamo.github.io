@@ -1,15 +1,16 @@
 ---
 title: "Typecho迁移Hugo实践"
 author: "mona"
-date: 2026-03-06
+date = '2026-03-08T12:15:45+08:00'
 categories: ["杂"]
 tags: []
-
 ---
 
-## 导出文章
+## 数据准备
 
-因为插件只支持mysql，而我的typecho使用sqlite3作为数据库，所以直接使用gemini写了个导出脚本 并按`文章分类/年/月/文章名.md`的格式导出
+### 导出文章md
+
+我的typecho使用sqlite3作为数据库，没有找到合适的插件，于是直接让gemini写个导出脚本。
 
 ```python
 import sqlite3
@@ -108,18 +109,155 @@ if __name__ == "__main__":
     migrate()
 ```
 
-## 导入文章
+------
 
-1. 把导出的文件夹 放入`/content/posts`目录下
-2. 将`usr`文件夹直接放进`static`目录 
+### 安装hugo
 
-至此文章数据导入完毕
+直接使用winget安装。`--version`可以指定版本。
+
+```shell
+winget install Hugo.Hugo --version 0.145.0
+```
 
 ------
 
-## 配置hugo
+### 导入文章
 
-下载一个喜欢的主题，按文档配置就好了~
+1. `hugo new site my-blog`创建站点
+2. 文章md放入站点目录下的`/content/posts`。
+3. `usr`文件夹放入`static`目录。
+
+-----
+
+### 配置hugo.toml
+
+找一个喜欢的主题放入`themes`文件夹，我这里使用了`LoveIt`主题，根据文档配置如下：
+
+```toml
+baseURL = 'https://menma.top/'
+languageCode = 'zh-CN'
+title = 'MenmaTop'
+theme = 'LoveIt'
+languageName = "简体中文"
+ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
+# 分页配置
+[pagination]
+  disableAliases = false
+  pagerSize = 20
+  path = "page"
+#菜单配置
+[menu]
+  [[menu.main]]
+    weight = 1
+    identifier = "posts"
+    pre = ""
+    post = ""
+    name = "所有文章"
+    url = "/posts/"
+    title = ""
+  [[menu.main]]
+    weight = 2
+    identifier = "tags"
+    pre = ""
+    post = ""
+    name = "标签"
+    url = "/tags/"
+    title = ""
+  [[menu.main]]
+    weight = 3
+    identifier = "categories"
+    pre = ""
+    post = ""
+    name = "分类"
+    url = "/categories/"
+    title = ""
+[params]
+  defaultTheme = "auto"
+  title = "MenmaTop"
+  images = ["/info/favicon/favicon.svg"]
+    [params.author]
+        name = "mona"
+        email = ""
+        link = "https://menma.top"
+    [params.header]
+        desktopMode = "fixed"
+        mobileMode = "auto"
+        [params.header.title]
+            logo = "/info/favicon/favicon.svg"
+            name = "MenmaTop"
+    [params.footer]
+        enable = true
+        hugo = false
+        copyright = false
+        author = false
+    [params.section]
+        paginate = 20
+        rss = 10
+    [params.list]
+        paginate = 20
+        rss = 10
+    [params.app]
+        title = "MenmaTop"
+        noFavicon = false
+        svgFavicon = "/info/favicon/favicon.svg"
+        # Android 浏览器主题色
+        themeColor = "#ffffff"
+        # Safari 图标颜色
+        iconColor = "#5bbad5"
+        # Windows v8-10磁贴颜色
+        tileColor = "#da532c"
+    # 搜索配置
+    [params.search]
+        enable = true
+        type = "algolia"
+        contentLength = 4000
+        placeholder = ""
+        maxResultLength = 10
+        snippetLength = 50
+        highlightTag = "em"
+        absoluteURL = false
+        [params.search.algolia]
+            index = ""
+            appID = ""
+            searchKey = ""
+    #主页配置
+    [params.home]
+        rss = 10
+        [params.home.profile]
+            enable = false
+        [params.home.posts]
+            enable = true
+            paginate = 20
+    [params.page]
+        [params.page.code]
+            copy = true
+            maxShownLines = 100
+        [params.page.math]
+            enable = true
+        [params.page.share]
+            enable = false
+    [params.analytics]
+         enable = false
+[markup]
+  [markup.highlight]
+  noClasses = false
+    [markup.goldmark]
+      [markup.goldmark.renderer]
+        unsafe = true
+      [markup.goldmark.extensions]
+        [markup.goldmark.extensions.passthrough]
+            enable = true
+            [markup.goldmark.extensions.passthrough.delimiters]
+            block = [['$$', '$$'], ['\[', '\]']]
+            inline = [['$', '$'], ['\(', '\)']]
+[outputs]
+    home = ["HTML", "RSS", "JSON"]
+    page = ["HTML"]
+    section = ["HTML", "RSS"]
+    taxonomy = ["HTML", "RSS"]
+```
+
+最后，使用`hugo server`命令来预览效果，没有问题就可以进行下一步操作。
 
 ------
 
@@ -127,7 +265,7 @@ if __name__ == "__main__":
 
 ### 创建`.gitignore`文件
 
-在项目根目录下创建`.gitignore`文件
+因为使用`Github Action`来生成文章，所以需要在项目根目录下创建`.gitignore`文件 排除一些不必要的目录和文件
 
 ```
 public/
@@ -139,7 +277,7 @@ resources/_gen/
 
 ### 在 GitHub 上创建仓库
 
-仓库名必须填`<你的用户名>.github.io`
+仓库名必须填`<用户名>.github.io`
 
 ------
 
@@ -181,14 +319,6 @@ permissions:
   pages: write
   id-token: write
 
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
-defaults:
-  run:
-    shell: bash
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -197,13 +327,29 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+          fetch-depth: 0
+
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
         with:
-          hugo-version: 'latest'
-          extended: true
+          hugo-version: '0.145.0'
+          extended: false
+
       - name: Build with Hugo
+        env:
+          HUGO_PARAMS_SEARCH_ALGOLIA_SEARCHKEY: ${{ secrets.HUGO_SEARCH_KEY }}
+          HUGO_PARAMS_SEARCH_ALGOLIA_APPID: ${{ secrets.APPLICATION_ID }}
+          HUGO_PARAMS_SEARCH_ALGOLIA_INDEX: ${{ secrets.INDEX_NAME }}
         run: hugo --minify
+
+      - name: Upload Algolia Indexes
+        uses: iChochy/Algolia-Upload-Records@main
+        env:
+          APPLICATION_ID: ${{ secrets.APPLICATION_ID }}
+          ADMIN_API_KEY: ${{ secrets.ADMIN_API_KEY }}
+          INDEX_NAME: ${{ secrets.INDEX_NAME }}
+          FILE_PATH: "public/index.json"
+      
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -224,7 +370,7 @@ jobs:
 **在 GitHub 网页端开启服务**
 
 1. 回到 GitHub 仓库页面，点击 **Settings** -> **Pages**。
-2. 在 **Build and deployment** 下的 **Source** 选项中，将默认的 "Deploy from a branch" 改为 **"GitHub Actions"**。
+2. 在 **Build and deployment** 下的 **Source** 选项中，将默认的 "**Deploy from a branch**" 改为 **"GitHub Actions"**。
 3. 提交刚才创建的 `.github/workflows/hugo.yaml` 文件到 GitHub：
 
 ```shell
@@ -239,7 +385,7 @@ git push
 
 ### **修改域名**
 
-1. 打开 GitHub 仓库：`menmamo` -> **Settings** -> **Pages**。
+1. 打开 GitHub 仓库：**Settings** -> **Pages**。
 2. 修改 **Custom domain**为自己的域名
 3. 在CloudFlare中为域名添加cname记录为`用户名.github.io`
 4. 等dns生效后勾选 **Enforce HTTPS**。
@@ -250,6 +396,14 @@ git push
 ## 修改/更新博客
 
 至此自动化部署环境已经搭建完成，提交修改（无论是写新文章、修改配置还是更换主题设置）只需要在本地终端执行简单的 **Git 三部曲**。
+
+**创建文章**
+
+```shell
+hugo new 文章
+```
+
+**提交修改**
 
 1. 检查状态（可选）
 
@@ -286,4 +440,3 @@ git push
 ```shell
 git pull origin main
 ```
-
