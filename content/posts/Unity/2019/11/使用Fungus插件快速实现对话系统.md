@@ -14,11 +14,11 @@ tags: []
 
 进入unity资源商店下载并导入到项目中
 
-![](/usr/uploads/2019/11/QQ20191121-204437@2x-1024x520.png)
+![](/usr/uploads/2019/11/QQ20191121-204437@2x.png)
 
 成功导入插件后，unity的标题栏会多出来一个tools
 
-![](/usr/uploads/2019/11/14C859EA-D6FF-41B3-BDE2-BF412E34DFA7-1024x40.jpg)
+![](/usr/uploads/2019/11/14C859EA-D6FF-41B3-BDE2-BF412E34DFA7.jpg)
 
 ## 2.使用
 
@@ -32,9 +32,9 @@ tags: []
 
 这时候会出现一个类似动画状态机的东西，我们点击New Block
 
-![](/usr/uploads/2019/11/0D5C279E-88FD-43CE-A1F7-B17F4C7B6037-1024x448.jpg)
+![](/usr/uploads/2019/11/0D5C279E-88FD-43CE-A1F7-B17F4C7B6037.jpg)
 
-![](/usr/uploads/2019/11/QQ20191121-205844@2x-806x1024.png)
+![](/usr/uploads/2019/11/QQ20191121-205844@2x.png)
 
 块名（Block Name）也就是这段对话的名字
 
@@ -54,7 +54,7 @@ tags: []
 
 ![](/usr/uploads/2019/11/QQ20191121-210957@2x.png)
 
-![](/usr/uploads/2019/11/QQ20191121-211507@2x-482x1024.png)
+![](/usr/uploads/2019/11/QQ20191121-211507@2x.png)
 
 
 
@@ -70,4 +70,4 @@ Sey Sya Dialog则是这个对话框的样式
 
 
 
-![](/usr/uploads/2019/11/QQ20191121-211916@2x-1024x608.png)
+![](/usr/uploads/2019/11/QQ20191121-211916@2x.png)
