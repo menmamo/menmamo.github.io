@@ -1,8 +1,9 @@
 ---
 title: "WSL2安装配置"
+author: "mona"
 date: 2026-03-13T00:18:00+08:00
+categories: ["杂"]
 tags: []
-categories: [杂"]
 ---
 
 ## 1. 基础安装与核心命令
