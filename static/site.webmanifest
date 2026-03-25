@@ -1,7 +1,7 @@
 {
   "name": "MenmaTop",
   "short_name": "MenmaTop",
-  "description": "mublog",
+  "description": "myblog",
   "display": "standalone",
   "icons": [
     {
