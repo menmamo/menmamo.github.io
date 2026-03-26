@@ -14,11 +14,14 @@ tags: []
 
 BDP = 125MB/s × 0.2s = 25MB 四舍五入为32MB
 
-因 `tcp_adv_win_scale` 设置为 -2 最大窗口大小为最大缓冲区空间的四分之一。
+由于 Linux 自动调优能够正确调整 RTT 较低的会话和吞吐量较低的瓶颈链路，我们只需要关注最大值即可。
 
-所以设置最大读写缓冲区的大小为 32×4 = 128M 换算成字节134217728
+`tcp_adv_win_scale` 使用默认的1。最大窗口大小为最大缓冲区空间的二分之一，所以需要将最大窗口大小设置为64M。
 
-日本选择100ms作为参考值 最终值为67108864
+```
+net.ipv4.tcp_rmem = 4096 131072 67108864
+net.ipv4.tcp_wmem = 4096 16384 67108864
+```
 
 ------
 
@@ -41,11 +44,10 @@ net.ipv4.tcp_slow_start_after_idle = 0
 ```
 net.core.default_qdisc=fq
 net.ipv4.tcp_congestion_control=bbr
-net.ipv4.tcp_slow_start_after_idle = 0
-net.ipv4.tcp_rmem = 8192 262144 134217728
-net.ipv4.tcp_wmem = 4096 16384 134217728
-net.ipv4.tcp_adv_win_scale = -2
+net.ipv4.tcp_rmem = 4096 131072 67108864
+net.ipv4.tcp_wmem = 4096 16384 67108864
 net.ipv4.tcp_notsent_lowat = 131072
+net.ipv4.tcp_slow_start_after_idle = 0
 ```
 
 **日本**
@@ -53,9 +55,8 @@ net.ipv4.tcp_notsent_lowat = 131072
 ```
 net.core.default_qdisc=fq
 net.ipv4.tcp_congestion_control=bbr
-net.ipv4.tcp_slow_start_after_idle = 0
-net.ipv4.tcp_rmem = 8192 262144 67108864
-net.ipv4.tcp_wmem = 4096 16384 67108864
-net.ipv4.tcp_adv_win_scale = -2
+net.ipv4.tcp_rmem = 4096 131072 33554432
+net.ipv4.tcp_wmem = 4096 16384 33554432
 net.ipv4.tcp_notsent_lowat = 131072
+net.ipv4.tcp_slow_start_after_idle = 0
 ```
