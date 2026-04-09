@@ -6,15 +6,17 @@ categories: ["Linux"]
 tags: []
 ---
 
-## 调整TCP窗口大小
+## 计算TCP最大窗口大小
 
-根据[cloudflare](https://blog.cloudflare.com/optimizing-tcp-for-high-throughput-and-low-latency/)的博客计算BDP
+依据[cloudflare博客](https://blog.cloudflare.com/optimizing-tcp-for-high-throughput-and-low-latency/)计算BDP，以美西为例：带宽取1000Mbps延迟取200ms
 
-带宽:1000Mbps = 125MB/s   延迟：200ms = 0.2s
+```
+BDP = 125MB/s × 0.2s = 25MB
+```
 
-BDP = 125MB/s × 0.2s = 25MB 四舍五入为32MB
+得到25MB四舍五入为32MB。
 
-由于 Linux 自动调优能够正确调整 RTT 较低的会话和吞吐量较低的瓶颈链路，我们只需要关注最大值即可。
+由于 Linux 自动调优能够正确调整 RTT 较低的会话和吞吐量较低的瓶颈链路，我们只需要调整最大值即可（其他值为默认）。
 
 `tcp_adv_win_scale` 使用默认的1。最大窗口大小为最大缓冲区空间的二分之一，所以需要将最大窗口大小设置为64M。
 
@@ -39,24 +41,11 @@ net.ipv4.tcp_slow_start_after_idle = 0
 
 ## 最终参数
 
-**美国**
-
 ```
 net.core.default_qdisc=fq
 net.ipv4.tcp_congestion_control=bbr
 net.ipv4.tcp_rmem = 4096 131072 67108864
 net.ipv4.tcp_wmem = 4096 16384 67108864
-net.ipv4.tcp_notsent_lowat = 131072
-net.ipv4.tcp_slow_start_after_idle = 0
-```
-
-**日本**
-
-```
-net.core.default_qdisc=fq
-net.ipv4.tcp_congestion_control=bbr
-net.ipv4.tcp_rmem = 4096 131072 33554432
-net.ipv4.tcp_wmem = 4096 16384 33554432
 net.ipv4.tcp_notsent_lowat = 131072
 net.ipv4.tcp_slow_start_after_idle = 0
 ```
