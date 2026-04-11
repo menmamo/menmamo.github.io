@@ -1,7 +1,7 @@
 ---
 title: "linux修改默认网卡名为eth0"
 author: "mona"
-date: 2026-04-10T22:59:00+08:00
+date: 2026-04-11T18:35:48+08:00
 categories: ["Linux"]
 tags: []
 ---
